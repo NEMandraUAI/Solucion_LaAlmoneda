@@ -36,6 +36,7 @@
             label1 = new Label();
             btnCrearLote = new Button();
             label2 = new Label();
+            btnGenerarInforme = new Button();
             ((System.ComponentModel.ISupportInitialize)dgvSubastasActivas).BeginInit();
             SuspendLayout();
             // 
@@ -118,11 +119,22 @@
             label2.TabIndex = 7;
             label2.Text = "Subastas Activas";
             // 
+            // btnGenerarInforme
+            // 
+            btnGenerarInforme.Location = new Point(174, 555);
+            btnGenerarInforme.Name = "btnGenerarInforme";
+            btnGenerarInforme.Size = new Size(156, 53);
+            btnGenerarInforme.TabIndex = 8;
+            btnGenerarInforme.Text = "Generar Informe";
+            btnGenerarInforme.UseVisualStyleBackColor = true;
+            btnGenerarInforme.Click += btnGenerarInforme_Click;
+            // 
             // frmAdminSubastas
             // 
             AutoScaleDimensions = new SizeF(7F, 15F);
             AutoScaleMode = AutoScaleMode.Font;
             ClientSize = new Size(800, 620);
+            Controls.Add(btnGenerarInforme);
             Controls.Add(label2);
             Controls.Add(btnCrearLote);
             Controls.Add(label1);
@@ -149,5 +161,6 @@
         private Label label1;
         private Button btnCrearLote;
         private Label label2;
+        private Button btnGenerarInforme;
     }
 }

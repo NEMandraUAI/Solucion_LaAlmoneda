@@ -136,5 +136,33 @@ namespace BLL
                 observador.Actualizar(nuevaSubasta);
             }
         }
+        public string GenerarInformeCierreJornada()
+        {
+            var subastasCerradas = _subastaDAL.ObtenerSubastasCerradasDelDia();
+            if (subastasCerradas.Count == 0)
+            {
+                return "No hay subastas finalizadas en la jornada actual.";
+            }
+            StringBuilder informe = new StringBuilder();
+            informe.AppendLine("==========================================================");
+            informe.AppendLine($"   INFORME DE CIERRE DE JORNADA - {DateTime.Now:dd/MM/yyyy}");
+            informe.AppendLine("==========================================================");
+            decimal totalRecaudado = 0;
+            foreach (var subasta in subastasCerradas)
+            {
+                informe.AppendLine($"\n► SUBASTA #{subasta.Id}");
+                informe.AppendLine($"  Adjudicado a: {(subasta.Ganador != null ? subasta.Ganador.Nombre : "Sin Ganador")}");
+                informe.AppendLine($"  PRECIO FINAL COBRADO: ${subasta.PrecioActual:F2}");
+                informe.AppendLine("  Estructura interna del catálogo (Transparente):");
+                informe.AppendLine(subasta.UnidadVenta.GenerarReporte(1));
+                totalRecaudado += subasta.PrecioActual;
+                informe.AppendLine("----------------------------------------------------------");
+            }
+            informe.AppendLine($"\n==========================================================");
+            informe.AppendLine($" TOTAL RECAUDADO EN LA JORNADA: ${totalRecaudado:F2}");
+            informe.AppendLine("==========================================================");
+
+            return informe.ToString();
+        }
     }
 }

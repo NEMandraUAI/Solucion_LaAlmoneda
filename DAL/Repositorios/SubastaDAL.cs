@@ -194,5 +194,78 @@ namespace DAL.Repositorios
                 }
             }
         }
+        public List<SubastaBE> ObtenerSubastasCerradasDelDia()
+        {
+            List<SubastaBE> lista = new List<SubastaBE>();
+            using (SqlConnection conn = ConexionDAL.ObtenerConexion())
+            {
+                string query = @"SELECT s.Id, s.PrecioActual, s.Estado, s.FilaVersion, s.IdGanador, 
+                                 u.Nombre AS NombreGanador,
+                                 uv.Id AS IdUV, uv.Nombre AS NombreUV, uv.Descripcion AS DescUnidad, uv.EsLote, uv.PrecioBase
+                                 FROM Subasta s
+                                 INNER JOIN UnidadVenta uv ON s.IdUnidadVenta = uv.Id
+                                 LEFT JOIN Usuario u ON s.IdGanador = u.Id
+                                 WHERE s.Estado = 'Cerrada' 
+                                 AND CAST(s.FechaHoraCierre AS DATE) = CAST(GETDATE() AS DATE)";
+                using (SqlCommand cmd = new SqlCommand(query, conn))
+                {
+                    conn.Open();
+                    using (SqlDataReader reader = cmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            bool esLote = Convert.ToBoolean(reader["EsLote"]);
+                            UnidadVentaBE unidad;
+                            if (esLote)
+                            {
+                                unidad = new LoteBE
+                                {
+                                    Id = Convert.ToInt32(reader["IdUV"]),
+                                    Nombre = reader["NombreUV"].ToString(),
+                                    Descripcion = reader["DescUnidad"].ToString()
+                                };
+                            }
+                            else
+                            {
+                                unidad = new ArticuloBE
+                                {
+                                    Id = Convert.ToInt32(reader["IdUV"]),
+                                    Nombre = reader["NombreUV"].ToString(),
+                                    Descripcion = reader["DescUnidad"].ToString(),
+                                    PrecioBaseHistorico = Convert.ToDecimal(reader["PrecioBase"])
+                                };
+                            }
+                            UsuarioBE ganadorObj = null;
+                            if (reader["IdGanador"] != DBNull.Value)
+                            {
+                                ganadorObj = new UsuarioBE
+                                {
+                                    Id = Convert.ToInt32(reader["IdGanador"]),
+                                    Nombre = reader["NombreGanador"].ToString()
+                                };
+                            }
+                            lista.Add(new SubastaBE
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                PrecioActual = Convert.ToDecimal(reader["PrecioActual"]),
+                                Estado = reader["Estado"].ToString(),
+                                FilaVersion = (byte[])reader["FilaVersion"],
+                                UnidadVenta = unidad,
+                                TienePujas = reader["IdGanador"] != DBNull.Value,
+                                Ganador = ganadorObj
+                            });
+                        }
+                    }
+                }
+            }
+            foreach (var sub in lista)
+            {
+                if (sub.UnidadVenta is LoteBE lote)
+                {
+                    CargarComponentesHijos(lote);
+                }
+            }
+            return lista;
+        }
     }
 }

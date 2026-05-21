@@ -115,13 +115,40 @@ namespace GUI
                 MessageBox.Show(ex.Message, "Error al cancelar", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
-
         private void btnCrearLote_Click(object sender, EventArgs e)
         {
             frmCrearItems formCrear = new frmCrearItems(_adminSesion, _unidadVentaBLL);
             if (formCrear.ShowDialog() == DialogResult.OK)
             {
                 ActualizarPantalla();
+            }
+        }
+        private void btnGenerarInforme_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                string informe = _subastaBLL.GenerarInformeCierreJornada();
+                Form frmInforme = new Form()
+                {
+                    Text = "Informe de Cierre de Jornada",
+                    Size = new Size(650, 500),
+                    StartPosition = FormStartPosition.CenterParent
+                };
+                TextBox txtInforme = new TextBox()
+                {
+                    Multiline = true,
+                    ReadOnly = true,
+                    Dock = DockStyle.Fill,
+                    ScrollBars = ScrollBars.Vertical,
+                    Font = new Font("Consolas", 10),
+                    Text = informe
+                };
+                frmInforme.Controls.Add(txtInforme);
+                frmInforme.ShowDialog();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Error al generar informe: " + ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
     }

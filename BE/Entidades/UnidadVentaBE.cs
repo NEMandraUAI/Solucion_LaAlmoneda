@@ -14,5 +14,6 @@ namespace BE.Entidades
         public decimal PrecioBaseHistorico { get; set; }
         public abstract decimal CalcularPrecioBase();
         public abstract string ObtenerDetalle();
+        public abstract string GenerarReporte(int nivel = 0);
     }
 }

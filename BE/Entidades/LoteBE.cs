@@ -20,5 +20,17 @@ namespace BE.Entidades
             }
             return detalle;
         }
+        public override string GenerarReporte(int nivel = 0)
+        {
+            string tab = new string('\t', nivel);
+            StringBuilder sb = new StringBuilder();
+            sb.AppendLine($"{tab}+ LOTE: {Nombre} | Precio Base Total: ${CalcularPrecioBase():F2}");
+            foreach (var comp in Componentes)
+            {
+                sb.AppendLine(comp.GenerarReporte(nivel + 1));
+            }
+
+            return sb.ToString().TrimEnd();
+        }
     }
 }
